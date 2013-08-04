@@ -111,51 +111,5 @@ function(Agent){
 			});
 		});
 
-		describe('hunger', function(){
-
-			it('has a hunger property', function(){
-				expect(agent.hunger).toBeDefined();
-				expect(_.isNumber(agent.hunger)).toEqual(true);
-			});
-
-			it('has the correct default hunger level', function(){
-				expect(agent.hunger).toEqual(0);
-			});
-
-			it('hunger increases by 1 on each tick', function(){
-				_(12).times(function(){
-					agent.tick();
-				});
-				expect(agent.hunger).toEqual(12);
-				_(3).times(function(){
-					agent.tick();
-				});
-				expect(agent.hunger).toEqual(15);
-			});
-
-			it('if hunger is over 100 then the agent is hurt() on each tick', function(){
-				var hurtStub = sinon.stub(agent, 'hurt');
-
-				agent.hunger = 100;
-				agent.tick();
-
-				expect(hurtStub.calledOnce).toEqual(true);
-				hurtStub.restore();
-			});
-
-			it('has an eat method which decreases hunger by 1', function(){
-				agent.hunger = 50;
-				agent.eat();
-				expect(agent.hunger).toEqual(49);
-			});
-
-			it('passing a number to eat decreases hunger by that amount', function(){
-				agent.hunger = 50;
-				agent.eat(25);
-				expect(agent.hunger).toEqual(25);
-			});
-
-		});
-
 	});
 });
