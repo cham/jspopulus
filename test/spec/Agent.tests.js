@@ -18,6 +18,36 @@ function(Agent){
 			clock.restore();
 		});
 
+		describe('initialisation', function(){
+			it('is alive', function(){
+				expect(agent.alive).toBeDefined();
+				expect(agent.alive).toEqual(true);
+			});
+
+			it('has a position as x,y coordinates', function(){
+				expect(agent.position).toBeDefined();
+				expect(agent.position.x).toBeDefined();
+				expect(agent.position.y).toBeDefined();
+				expect(_.isNumber(agent.position.x)).toEqual(true);
+				expect(_.isNumber(agent.position.y)).toEqual(true);
+			});
+
+			it('has a numticks property with the starting value of 0', function(){
+				expect(agent.numticks).toBeDefined();
+				expect(agent.numticks).toEqual(0);
+			});
+
+			it('has a health property set at 100', function(){
+				expect(agent.health).toBeDefined();
+				expect(agent.health).toEqual(100);
+			});
+
+			it('has a speed property set at 1', function(){
+				expect(agent.speed).toBeDefined();
+				expect(agent.speed).toEqual(1);
+			});
+		});
+
 		describe('death', function(){
 			it('has a die method', function(){
 				expect(agent.die).toBeDefined();
@@ -56,6 +86,36 @@ function(Agent){
 					agent.die();
 					agent.move({x:5,y:5});
 					expect(agent.position).toEqual({x:0,y:0});
+				});
+			});
+
+			describe('moveTowards', function(){
+				it('has a moveTowards method', function(){
+					expect(agent.moveTowards).toBeDefined();
+					expect(_.isFunction(agent.moveTowards)).toEqual(true);
+				});
+
+				it('moveTowards calls move, passing the correct direction to move in based on the agent speed', function(){
+					var moveStub = sinon.stub(agent, 'move');
+
+					agent.moveTowards({x:10,y:10});
+
+					expect(moveStub.calledOnce).toEqual(true);
+					expect(moveStub.args[0][0]).toEqual({x: 1, y: 1});
+
+					moveStub.restore();
+				});
+
+				it('increasing the agent speed increases the values of the coordinates sent to move', function(){
+					var moveStub = sinon.stub(agent, 'move');
+
+					agent.speed = 3;
+					agent.moveTowards({x:10,y:0});
+
+					expect(moveStub.calledOnce).toEqual(true);
+					expect(moveStub.args[0][0]).toEqual({x: 3, y: 0});
+
+					moveStub.restore();
 				});
 			});
 

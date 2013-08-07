@@ -1,9 +1,9 @@
 define(function(){
 	'use strict';
 
-	return Toolbox.Base.extend({
+	var Locations = Toolbox.Base.extend({
 		constructor: function(){
-			this.locations = [{id:'0',name:'Center of the world',position:{x:0,y:0},type:'landmark'}];
+			this.reset();
 		},
 		findClosestLocation: function(locationData, position){
 			var matchingLocations = this.findLocations(locationData);
@@ -14,9 +14,9 @@ define(function(){
 			if(matchingLocations.length === 1){
 				return matchingLocations[0];
 			}
-			return _(matchingLocations).sort(function(loc){
+			return _(matchingLocations).sortBy(function(loc){
 					return Math.abs(loc.position.x - position.x) + Math.abs(loc.position.y - position.y);
-				}).reverse()[0];
+				})[0];
 		},
 		findLocations: function(locationData){
 			return _(this.locations)
@@ -47,7 +47,12 @@ define(function(){
 			}));
 
 			return locationId;
+		},
+		reset: function(){
+			this.locations = [{id:'0',name:'Center of the world',position:{x:0,y:0},type:'landmark'}];
 		}
 	});
+
+	return new Locations();
 
 });

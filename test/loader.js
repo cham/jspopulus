@@ -4,6 +4,7 @@
 	var testFiles = [
 		'spec/Agent.tests.js',
 		'spec/Character.tests.js',
+		'spec/DecisionMaker.tests.js',
 		'spec/Locations.tests.js'
 	];
 
