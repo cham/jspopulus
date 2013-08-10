@@ -50,7 +50,6 @@ define(function(){
 				'Zack',
 				'Rob',
 				'Lee',
-				'Karim',
 				'Jon',
 				'John',
 				'Alastair'

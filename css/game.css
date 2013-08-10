@@ -1,4 +1,5 @@
 .person {
 	float: left;
-	width: 50%;
+	width: 25%;
+	font-size: 0.6em;
 }
