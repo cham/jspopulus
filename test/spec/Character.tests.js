@@ -17,7 +17,7 @@ function(
 			clock = sinon.useFakeTimers();
 
 		beforeEach(function(){
-			jobStub = sinon.stub(DecisionMaker.prototype, 'getJob', function(){ return {type:'somenewjob'}; });
+			jobStub = sinon.stub(DecisionMaker, 'getJob', function(){ return {type:'somenewjob'}; });
 			character = new Character();
 		});
 
@@ -34,7 +34,7 @@ function(
 
 			it('has an instance of DecisionMaker in order to make decisions', function(){
 				expect(character.decisions).toBeDefined();
-				expect(character.decisions instanceof DecisionMaker).toEqual(true);
+				expect(_.isObject(character.decisions)).toEqual(true);
 			});
 
 			it('has a hunger property with the correct default hunger level', function(){

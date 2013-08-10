@@ -39,6 +39,20 @@ function(
 				this.hunger = 0;
 			}
 		},
+		addItem: function(itemname, qty){
+			if(!this.inventory[itemname]){
+				this.inventory[itemname] = qty;
+			}else{
+				this.inventory[itemname] += qty;
+			}
+		},
+		removeItem: function(itemname, qty){
+			if(!this.inventory[itemname]){
+				this.inventory[itemname] = 0;
+			}else{
+				this.inventory[itemname] -= qty;
+			}
+		},
 		doJob: function(){
 			if(!this.alive || !this.jobs.length){ return; }
 
@@ -48,9 +62,9 @@ function(
 			if(jobTypeInfo[0] === 'travel'){
 				this.moveTowards(currentJob.location.position);
 			}else if(jobTypeInfo[0] === 'get'){
-				this.inventory[jobTypeInfo[1]] += currentJob.quantity;
+				this.addItem(jobTypeInfo[1], currentJob.quantity);
 			}else if(jobTypeInfo[0] === 'eat' && this.inventory[jobTypeInfo[1]]>0){
-				this.inventory[jobTypeInfo[1]]--;
+				this.removeItem(jobTypeInfo[1], currentJob.quantity);
 				if(jobTypeInfo[1] === 'food'){
 					this.eat(500);
 				}
