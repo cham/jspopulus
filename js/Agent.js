@@ -6,7 +6,7 @@ function(
 
 	return Toolbox.Base.extend({
 		constructor: function(options){
-			options = _(options || {}).extend({
+			options = _(options || {}).defaults({
 				alive: true,
 				position: options.position || {x:0, y:0},
 				health: 100,

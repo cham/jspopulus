@@ -12,7 +12,7 @@ function(
 
 	return Agent.extend({
 		constructor: function(options){
-			options = _(options || {}).extend({
+			options = _(options || {}).defaults({
 				hunger: 0,
 				jobs: [],
 				gender: Math.random() > 0.5 ? 'male': 'female',
