@@ -11,17 +11,25 @@ function(
 	'use strict';
 
 	return Agent.extend({
-		constructor: function(){
-			this.hunger = 0;
-			this.jobs = [];
-			this.decisions = new DecisionMaker();
-			this.gender = Math.random() > 0.5 ? 'male': 'female';
-			this.name = NameGenerator.getName(this.gender);
-			this.inventory = {
-				food: 0
-			};
+		constructor: function(options){
+			options = _(options || {}).extend({
+				hunger: 0,
+				jobs: [],
+				gender: Math.random() > 0.5 ? 'male': 'female',
+				speed: 1,
+				inventory: options.inventory || {}
+			});
 
-			Agent.prototype.constructor.call(this);
+			
+			this.hunger = options.hunger;
+			this.jobs = options.jobs;
+			this.gender = options.gender;
+			this.inventory = options.inventory;
+
+			this.decisions = DecisionMaker;
+			this.name = NameGenerator.getName(this.gender);
+
+			Agent.prototype.constructor.call(this, options);
 		},
 		eat: function(howmuch){
 			if(!this.alive){ return; }

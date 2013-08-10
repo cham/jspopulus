@@ -5,13 +5,19 @@ function(
 	'use strict';
 
 	return Toolbox.Base.extend({
-		constructor: function(){
-			this.alive = true;
-			this.position = {x:0,y:0};
+		constructor: function(options){
+			options = _(options || {}).extend({
+				alive: true,
+				position: options.position || {x:0, y:0},
+				health: 100,
+				speed: 1
+			});
+
 			this.numticks = 0;
-			this.health = 100;
-			this.speed = 1;
-			this.randomChance = 1/100;
+			this.alive = options.alive;
+			this.position = options.position;
+			this.health = options.health;
+			this.speed = options.speed;
 		},
 		move: function(coords){
 			if(!this.alive){ return; }
