@@ -1,11 +1,9 @@
 define([
 	'Agent',
-	'DecisionMaker',
 	'NameGenerator'
 ],
 function(
 	Agent,
-	DecisionMaker,
 	NameGenerator
 ){
 	'use strict';
@@ -14,20 +12,27 @@ function(
 		constructor: function(options){
 			options = _(options || {}).defaults({
 				hunger: 0,
+				sexdrive: 0,
 				jobs: [],
 				gender: Math.random() > 0.5 ? 'male': 'female',
-				speed: 1,
-				inventory: options.inventory || {}
+				inventory: options.inventory || {},
+				surname: '',
+				fathername: '',
+				fertility: 0.3,
+				onBirth: function(options){}
 			});
 
-			
 			this.hunger = options.hunger;
+			this.sexdrive = options.sexdrive;
 			this.jobs = options.jobs;
 			this.gender = options.gender;
 			this.inventory = options.inventory;
+			this.fertility = options.fertility;
+			this.onBirth = options.onBirth;
 
-			this.decisions = DecisionMaker;
+			this.id = parseInt(_.uniqueId(), 10);
 			this.name = NameGenerator.getName(this.gender);
+			this.surname = NameGenerator.getSurname(this.gender, options.surname, options.fathername);
 
 			Agent.prototype.constructor.call(this, options);
 		},
@@ -53,22 +58,36 @@ function(
 				this.inventory[itemname] -= qty;
 			}
 		},
+		giveBirth: function(father){
+			this.onBirth({
+				surname: this.surname,
+				fathername: father.name,
+				position: _(this.position).clone()
+			});
+		},
+		mate: function(partner){
+			this.sexdrive = 0;
+			if(this.gender === 'female' && Math.random() < this.fertility){
+				this.giveBirth(partner);
+			}
+		},
 		doJob: function(){
 			if(!this.alive || !this.jobs.length){ return; }
 
-			var currentJob = this.jobs[0],
-				jobTypeInfo = currentJob.type.split(':');
+			var currentJob = this.jobs[0];
 
-			if(jobTypeInfo[0] === 'travel'){
+			if(currentJob.type === 'travel'){
 				this.moveTowards(currentJob.location.position);
-			}else if(jobTypeInfo[0] === 'get'){
-				this.addItem(jobTypeInfo[1], currentJob.quantity);
-			}else if(jobTypeInfo[0] === 'eat' && this.inventory[jobTypeInfo[1]]>0){
-				this.removeItem(jobTypeInfo[1], currentJob.quantity);
-				if(jobTypeInfo[1] === 'food'){
+			}else if(currentJob.type === 'get'){
+				this.addItem(currentJob.inventory, currentJob.quantity);
+			}else if(currentJob.type === 'eat' && this.inventory[currentJob.inventory]>0){
+				this.removeItem(currentJob.inventory, 1);
+				if(currentJob.inventory === 'food'){
 					this.eat(500);
 				}
-			}else if(jobTypeInfo[0] === 'idle'){
+			}else if(currentJob.type === 'mate'){
+				this.mate(currentJob.agent);
+			}else if(currentJob.type === 'idle'){
 				this.move({
 					x: Math.round(Math.random()*this.speed*2)-this.speed,
 					y: Math.round(Math.random()*this.speed*2)-this.speed
@@ -78,12 +97,10 @@ function(
 		tick: function(){
 			if(!this.alive){ return; }
 
-			this.hunger++;
+			this.hunger += Math.floor(Math.random()*3)+1;
+			this.sexdrive += Math.floor(Math.random()*5)+1;
 			if(this.hunger>500){
 				this.hurt();
-			}
-			if(this.hunger<300 && this.health<100){
-				this.hurt(-1);
 			}
 			this.jobs = [this.decisions.getJob(this)];
 			this.doJob();

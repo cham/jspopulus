@@ -1,5 +1,34 @@
+*, *:before, *:after {
+  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+body {
+	padding: 5px;
+}
 .person {
 	float: left;
-	width: 25%;
-	font-size: 0.6em;
+	width: 15%;
+	font-size: 0.55em;
+	line-height: 0.7em;
+	color: #666;
+	margin: 5px;
+	padding: 5px;
+	height: 122px;
+	overflow: hidden;
+}
+.person.male {
+	background: #ddf;
+}
+.person.female {
+	background: #fdd;
+}
+.name {
+	line-height: 1em;
+	font-size: 1.4em;
+	color: #333;
+	margin-top: 0;
+}
+.numpeople {
+	position: fixed;
+	bottom: 3px;
+	right: 3px;
 }

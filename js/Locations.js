@@ -50,6 +50,26 @@ define(function(){
 		},
 		reset: function(){
 			this.locations = [{id:'0',name:'Center of the world',position:{x:0,y:0},type:'landmark'}];
+			this.agents = {};
+		},
+		addAgent: function(agent){
+			this.agents[agent.id] = agent;
+		},
+		removeAgent: function(agent){
+			delete this.agents[agent.id];
+		},
+		findAgent: function(filters){
+			return _(this.agents).find(function(agent){
+				return _(filters).reduce(function(memo, filter, key){
+					if(memo === false){ return false; }
+					if(_.isFunction(filter)){
+						memo = filter(agent[key]);
+					}else{
+						memo = agent[key] === filter;
+					}
+					return memo;
+				}, null);
+			});
 		}
 	});
 

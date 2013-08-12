@@ -46,7 +46,6 @@ define(function(){
 				'Vernon',
 				'Will',
 				'Xavier',
-				'Yves',
 				'Zack',
 				'Rob',
 				'Lee',

@@ -11,22 +11,39 @@ function(
 ){
 	'use strict';
 
-	function getReadableJobType(type){
-		if(type === 'travel:food'){
-			return 'travelling to get food';
+	// shim layer with setTimeout fallback
+	window.requestAnimFrame = (function(){
+	  return  window.requestAnimationFrame       ||
+	          window.webkitRequestAnimationFrame ||
+	          window.mozRequestAnimationFrame    ||
+	          function( callback ){
+	            window.setTimeout(callback, 1000 / 60);
+	          };
+	})();
+
+	function getReadableJob(jobInfo){
+		var jobstr = '';
+
+		if(!jobInfo){ return; }
+		
+		if(jobInfo.type === 'travel'){
+			jobstr += 'travelling';
+			if(jobInfo.target){
+				jobstr += ' to ' + jobInfo.target;
+			}
 		}
-		if(type === 'get:food'){
-			return 'getting some food';
+		if(jobInfo.type === 'get'){
+			jobstr += 'getting some ';
 		}
-		if(type === 'eat:food'){
-			return 'eating';
+		if(jobInfo.type === 'eat'){
+			jobstr += 'eating';
 		}
-		return type;
+		return jobstr || jobInfo.type;
 	}
 
-	var worldSize = 300,
-		numpeople = 12,
-		numfood = 4,
+	var worldSize = 900,
+		numpeople = 6,
+		numfood = 6,
 		foodnames = ['Bananas', 'Wheat', 'Apple Tree', 'Cucumber Field', 'Wild Lettuce'],
 		characterManager = new CharacterManager();
 
@@ -38,7 +55,7 @@ function(
 			},
 			hunger: Math.floor(Math.random()*200)
 		});
-		$('body').append('<div class="person person'+i+'"><h1 class="name"></h1><h3 class="status"></h3><h3 class="health"></h3><h3 class="hunger"></h3><h3 class="job"></h3><h3 class="position"></h3><h3 class="inventory"></h3>');
+		
 	});
 
 	_(numfood).times(function(){
@@ -56,18 +73,35 @@ function(
 	$('body').append('<h4>' + _(Locations.locations).reduce(function(memo, location){
 		return memo + location.name + ' (' + location.type +') at ' + location.position.x + ', ' + location.position.y + '<br>';
 	},'') + '</h4>');
+	$('body').append('<button>Stop</button');
+	$('body').append('<span class="numpeople"></span>');
 
 
+	var running = true;
+	$('button').click(function(e){
+		e.preventDefault();
+		running = false;
+	});
 	(function gametick(){
-		var $person;
+		var $person, age;
+
+		if(!running){ return; }
 
 		characterManager.tick();
 
+		$('.person').remove();
 		_(characterManager.people).each(function(person,i){
+			if(i>50){ return ;}
+			$('body').append('<div class="person person'+i+' '+person.gender+'"><h1 class="name"></h1><h3 class="age"></h3><h3 class="status"></h3><h3 class="health"></h3><h3 class="hunger"></h3><h3 class="job"></h3><h3 class="position"></h3><h3 class="inventory"></h3>');
 			$person = $('.person'+i);
 			if(person.alive){
-				$person.find('.name').text(person.name + ', ' + (Math.floor(person.numticks/365)+16) + ', ' + person.gender);
-				$person.find('.status').text(person.name + ' is currently ' + getReadableJobType(person.jobs[0].type));
+				age = (Math.floor(person.numticks/(365/4))+16);
+				if(age>30){
+					person.hurt(3);
+				}
+				$person.find('.name').text(person.name + ' ' + person.surname);
+				$person.find('.age').text(person.gender + ', ' + age);
+				$person.find('.status').text(person.name + ' is currently ' + getReadableJob(person.jobs[0]));
 				$person.find('.health').text('Health: ' + person.health);
 				$person.find('.hunger').text('Hunger: ' + person.hunger);
 				$person.find('.position').text('Position: ' + person.position.x + ', ' + person.position.y);
@@ -77,7 +111,13 @@ function(
 			}
 		});
 
-		setTimeout(gametick, 100);
+		$('.numpeople').text(_(characterManager.people).size());
+
+		if(_(characterManager.people).size() === 0){
+			$('body').append("<h1>Everyone has died!</h1>");
+		}else{
+			requestAnimFrame(gametick);
+		}
 	})();
 
 });

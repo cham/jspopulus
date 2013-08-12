@@ -1,6 +1,8 @@
 define([
+	'DecisionMaker',
 ],
 function(
+	DecisionMaker
 ){
 	'use strict';
 
@@ -10,7 +12,8 @@ function(
 				alive: true,
 				position: options.position || {x:0, y:0},
 				health: 100,
-				speed: 1
+				speed: 1,
+				onDeath: function(person){}
 			});
 
 			this.numticks = 0;
@@ -18,6 +21,10 @@ function(
 			this.position = options.position;
 			this.health = options.health;
 			this.speed = options.speed;
+			this.onDeath = options.onDeath;
+
+			this.decisions = DecisionMaker;
+			this.decisions.addAgent(this);
 		},
 		move: function(coords){
 			if(!this.alive){ return; }
@@ -42,8 +49,18 @@ function(
 				this.die();
 			}
 		},
+		heal: function(howmuch){
+			if(!this.alive){ return; }
+
+			this.health += howmuch || 1;
+			if(this.health>100){
+				this.health = 100;
+			}
+		},
 		die: function(){
 			this.alive = false;
+			this.decisions.removeAgent(this);
+			this.onDeath(this);
 		},
 		tick: function(){
 			if(!this.alive){ return; }
